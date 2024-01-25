@@ -1,0 +1,71 @@
+select it.title, price, user_id, item_id, shop_id, qty, (qty * price) as summ, date_sale, fullname, birthday
+from items as it 
+join itemsales as its on it.id = its.item_id
+join users as u on u.id = its.user_id
+where price < 100 
+ORDER by price
+
+select *
+from items
+where price > (select avg(price) from items);
+
+select sum(qty),title
+from items, itemsales
+where items.id = itemsales.item_id
+and title like '%хлеб%';
+
+select title, price, sum(qty)
+from items, itemsales
+where items.id = itemsales.item_id
+and year(date_sale)=2022 
+and month(date_sale) in (1,2,12)
+group by title
+order by sum(qty) desc
+limit 1;
+
+select id, fullname, birthday, year(now()) - year(birthday) as age 
+from users
+where birthday <= '1983-11-04'
+order by age desc;
+
+select *
+from items
+where price > (select avg(price) from items);
+
+select items.title, items.price, sum(itemsales.qty) as total_qty
+from items
+join itemsales on items.id = itemsales.item_id
+where year(date_sale)=2023 
+and month(date_sale) in (1,2,12) 
+group by items.title, items.price
+order by total_qty desc 
+limit 5;
+
+create table singers (id INT PRIMARY KEY, fullname VARCHAR(40), lastname NVARCHAR(50))
+insert into singers (id, fullname, lastname)
+VALUES (1, 'Егор','Крид'),
+(2, 'Вера','Брежнева'),
+(3, 'ГИО','ПИКА'),
+(4, 'Алёна','Бурхат'),
+(5, 'Ислам','Итляшев')
+
+create table songs (id INT PRIMARY key AUTO_INCREMENT, song VARCHAR(40), singers_id INT)
+insert into songs (song, singers_id)
+values ('Листопадом', 3),
+('Сердцеедка', 1),
+('Громко играй аппаратура', 5),
+('Ад-колыма', 3),
+('Чьё имя берегу', 4)
+
+select fullname, lastname, song, singers_id
+from singers as si
+left join songs as so on si.id = so.singers_id
+
+with AllUserSales as (
+	select items.title as itemTitle, price, qty, date_sale, fullname, birthday, 
+	shops.title as shopTitle, address 
+	from items left join itemsales 
+	on items.id = itemsales.item_id right join users 
+	on users.id = itemsales.user_id left join shops
+	on shops.id = itemsales.shop_id
+) select * from AllUserSales where price > 50 and price < 150;
